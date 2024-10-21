@@ -4,7 +4,9 @@ The car market in the UK is the target of analysis for this project, focusing on
 
 # Dataset description
 
-"DVM-CAR A Large-Scale Dataset for Automotive Applications " is the dataset, publicly available, used for this analysis.  [View website to download](https://deepvisualmarketing.github.io/) Although the dataset also offers a wide range of cars images, for the purposes of this project our interest is in the following tables:
+"DVM-CAR A Large-Scale Dataset for Automotive Applications " is the dataset, publicly available, used for this analysis.  [View website to download](https://deepvisualmarketing.github.io/)
+
+Although the dataset also offers a wide range of cars images, for the purposes of this project our interest is in the following tables:
 
 + Basic Table: contains basic information about brand, model and model ID;
 + Price Table: Price of each model over the years;
@@ -158,8 +160,8 @@ FROM Maxsold_cte
 WHERE rk = 1;
 ```
 
-![7-1 DVM CAR](https://github.com/user-attachments/assets/7113f64f-5b3f-495e-aec6-a157781204f4) ![7-3 DVM CAR](https://github.com/user-attachments/assets/54b50d4f-3081-4414-bf61-7f047c5113e0)
-![7-2 DVM CAR](https://github.com/user-attachments/assets/c5c262de-c70a-4bec-8a93-9b72ec0c4240)
+![7-1 DVM CAR](https://github.com/user-attachments/assets/7113f64f-5b3f-495e-aec6-a157781204f4) 
+![7-2 DVM CAR](https://github.com/user-attachments/assets/c5c262de-c70a-4bec-8a93-9b72ec0c4240) ![7-3 DVM CAR](https://github.com/user-attachments/assets/54b50d4f-3081-4414-bf61-7f047c5113e0)
 
 8 - Fuel type (1998 - 2021):
 
@@ -337,4 +339,7 @@ GROUP BY Adv_year
 ORDER BY COUNT(Adv_year) DESC;
 ```
 
-![14 DVM CAR](https://github.com/user-attachments/assets/26b3a0b9-083b-4c66-8962-63a5b19059b3)
+# Power BI Dashboard
+
+![Power Bi dashboard 1](https://github.com/user-attachments/assets/eec58d00-5c91-4e16-9f8d-814ab5e678ad)
+![Power Bi dashboard 2](https://github.com/user-attachments/assets/cf04d5dc-c40a-494d-9735-6f47c062f51b)
