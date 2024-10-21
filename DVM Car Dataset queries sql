@@ -1,0 +1,355 @@
+CREATE DATABASE DVM_CAR
+USE DVM_CAR
+
+-- Import tables
+-- Check for unique ID and drop column maker in other tabler
+	
+-- Ad_tbl
+SELECT *
+FROM Ad_tbl; -- Adv_ID column
+
+SELECT
+	Adv_ID,
+	COUNT(*)
+FROM Ad_tbl
+GROUP BY Adv_ID
+HAVING COUNT(*) > 1;
+
+-- Basic_tbl
+SELECT *
+FROM Basic_tbl; -- Genmodel_ID column
+
+SELECT
+	Genmodel_ID,
+	COUNT(*)
+FROM Basic_tbl
+GROUP BY Genmodel_ID
+HAVING COUNT(*) > 1;
+
+ALTER TABLE Basic_tbl
+ADD PRIMARY KEY (Genmodel_ID);
+
+-- Price_tbl
+SELECT *
+FROM Price_tbl; -- Unique ID column has to be created
+
+ALTER TABLE Price_tbl
+ADD Price_ID nvarchar(100);
+
+UPDATE Price_tbl
+SET Price_ID = CONCAT(Genmodel,'_',Genmodel_ID,'_',[Year]);
+
+ALTER TABLE Price_tbl
+ADD PRIMARY KEY (Price_ID);
+
+-- Sales_tbl
+SELECT *
+FROM Sales_tbl; -- Unique ID column has to be created
+
+ALTER TABLE Sales_tbl
+ADD Sales_ID nvarchar(200);
+
+WITH NR_cte AS (
+	SELECT *,
+		ROW_NUMBER() OVER (PARTITION BY Genmodel ORDER BY (SELECT NULL)) AS RN
+	FROM Sales_tbl
+)
+UPDATE NR_cte
+SET Sales_ID = CONCAT(Genmodel,'_',RN);
+
+ALTER TABLE Sales_tbl
+ADD PRIMARY KEY (Sales_ID);
+
+-- Trim_tbl
+SELECT *
+FROM Trim_tbl; -- Unique ID column has to be created
+
+ALTER TABLE Trim_tbl
+ADD Trim_ID nvarchar(100);
+
+WITH NR_cte AS (
+	SELECT
+		*,
+		ROW_NUMBER() OVER (PARTITION BY Genmodel_ID ORDER BY (SELECT NULL)) AS RN
+	FROM Trim_tbl
+)
+UPDATE NR_cte
+SET Trim_ID = CONCAT(Genmodel_ID,'_',RN);
+
+--Basic table
+-- How many brands and how many models per brand
+SELECT COUNT(DISTINCT Automaker_ID) AS [Brands]
+FROM Basic_tbl;
+
+SELECT
+	'Total' AS [Automaker],
+	COUNT(Genmodel) AS [Number_of_models]
+FROM Basic_tbl
+UNION ALL
+SELECT
+	Automaker,
+	COUNT(Genmodel) AS [Number_of_models]
+FROM Basic_tbl
+GROUP BY Automaker
+ORDER BY Number_of_models DESC;
+
+--Price table
+-- Average car price, most expensive and cheapest car per brand and year
+SELECT
+	Maker,
+	AVG(Entry_price) AS [Avg_Price],
+	MIN(Entry_price) AS [Min_Price],
+	MAX(Entry_price) AS [Max_Price],
+	[Year]
+FROM Price_tbl
+GROUP BY
+	Maker,
+	[Year]
+ORDER BY Maker;
+
+--Average car price per year
+SELECT
+	[Year],
+	AVG(Entry_Price) AS [Average_car_price]
+FROM Price_tbl
+GROUP BY [Year]
+ORDER BY [Year];
+
+--Sales table
+-- Automakers from the most sold to the least sold brand (Sales table, new units) (2001 - 2020)
+CREATE VIEW UnpivotedSales AS
+SELECT Maker, Genmodel, Genmodel_ID, [Year], Units
+FROM 
+   (SELECT Maker, [Genmodel],[Genmodel_ID],[Year_2020],[Year_2019],[Year_2018],[Year_2017]
+      ,[Year_2016],[Year_2015],[Year_2014],[Year_2013],[Year_2012],[Year_2011],[Year_2010]
+      ,[Year_2009],[Year_2008],[Year_2007],[Year_2006],[Year_2005],[Year_2004],[Year_2003]
+      ,[Year_2002],[Year_2001]
+    FROM Sales_tbl) AS p
+UNPIVOT
+   (Units FOR [Year] IN ([Year_2020],[Year_2019],[Year_2018],[Year_2017]
+      ,[Year_2016],[Year_2015],[Year_2014],[Year_2013],[Year_2012],[Year_2011],[Year_2010]
+      ,[Year_2009],[Year_2008],[Year_2007],[Year_2006],[Year_2005],[Year_2004],[Year_2003]
+      ,[Year_2002],[Year_2001])) AS unpvt;
+GO;
+
+SELECT
+	Maker,
+	SUM(Units) AS [Units_sold]
+FROM UnpivotedSales
+GROUP BY Maker
+ORDER BY Units_sold DESC;
+
+--3 most sold brands per year
+SELECT
+	Maker,
+	Units_sold,
+	[Year],
+	rn
+FROM (
+	SELECT
+		Maker,
+		SUM(Units) AS [Units_sold],
+		[Year],
+		ROW_NUMBER() OVER (PARTITION BY [Year] ORDER BY SUM(Units) DESC) AS rn
+	FROM UnpivotedSales
+	GROUP BY 
+		Maker,
+		[Year]
+) AS RankedBrands
+WHERE rn IN (1,2,3)
+ORDER BY [Year];
+
+-- Top 10 sold models in general (2001 - 2020)
+SELECT TOP 10
+	Maker,
+	Genmodel,
+	SUM(Units) AS [Units_sold]
+FROM UnpivotedSales
+GROUP BY
+	Maker,
+	Genmodel
+ORDER BY [Units_sold] DESC;
+
+-- Most sold model per brand (2001 - 2020)
+WITH Maxsold_cte AS (
+	SELECT
+		Maker,
+		Genmodel,
+		RANK() OVER (PARTITION BY Maker ORDER BY SUM(Units) DESC) AS rk,
+		SUM(Units) AS [Units_sold]
+	FROM UnpivotedSales
+	GROUP BY
+		Maker,
+		Genmodel
+)
+SELECT
+	Maker,
+	Genmodel,
+	[Units_sold]
+FROM Maxsold_cte
+WHERE rk = 1;
+
+--Trim table
+-- Fuel type (1998 - 2021)
+WITH Fuel_cte  AS (
+	SELECT
+		Fuel_Type,
+		COUNT(Fuel_type) AS [Quantity]
+	FROM Trim_tbl
+	GROUP BY Fuel_type
+)
+SELECT
+	Fuel_cte.*,
+	ROUND(100 * [Quantity] / SUM(Quantity) OVER(),2) AS [Percentage]
+FROM Fuel_cte
+GROUP BY
+	Fuel_type,
+	Quantity;
+
+--Electric cars on the 'Other' category, based on 0 gas emission. How many are they, cheapest and most expensive?
+SELECT
+	Fuel_Type,
+	COUNT(Fuel_type) AS [Quantity],
+	MIN(Price) AS [Cheapest],
+	MAX(Price) AS [Most expensive]
+FROM Trim_tbl
+WHERE Gas_emission = 0
+	AND Fuel_type = 'Other'
+GROUP BY Fuel_type;
+
+--Hybrid cars? This is only the minimum number as they may have different trim details, abbreviations, gas emission etc.
+WITH Hybrid_cte AS (
+	SELECT
+		'Hybrid' AS [Fuel_type],
+		Fuel_type AS [Category_found],
+		COUNT(Fuel_type) AS [Quantity]
+	FROM Trim_tbl
+	WHERE Fuel_type = 'Other'
+		AND [Trim] LIKE '%hybrid%'
+	GROUP BY Fuel_type
+	UNION ALL
+	SELECT
+		'Hybrid' AS [Fuel_type],
+		Fuel_type,
+		COUNT(Fuel_type) AS [Quantity]
+	FROM Trim_tbl
+	WHERE Fuel_type <> 'Other'
+		AND [Trim] LIKE '%hybrid%'
+	GROUP BY Fuel_type
+	UNION ALL
+	SELECT
+		'Hybrid' AS [Fuel_type],
+		Fuel_type,
+		COUNT(Fuel_type) AS [Quantity]
+	FROM Trim_tbl
+	WHERE [Trim] NOT LIKE '%hybrid%'
+		AND [Trim] LIKE '%hev%'
+	GROUP BY Fuel_type
+)
+SELECT 
+	'Hybrid' AS [Fuel_type],
+	'Total' AS [Total],
+	SUM([Quantity]) AS [Quantity]
+FROM Hybrid_cte;
+
+--Engine size
+SELECT
+	CASE WHEN Engine_size < 1000 THEN '< 1.0'
+		WHEN Engine_size BETWEEN 1000 AND 2000 THEN '1.0 - 2.0'
+		WHEN Engine_size BETWEEN 2000 AND 3000 THEN '2.0 - 3.0'
+	ELSE '> 3.0'
+	END AS [Engine_size],
+	COUNT(Engine_size) AS [Quantity]
+FROM Trim_tbl
+GROUP BY CUBE(
+CASE WHEN Engine_size < 1000 THEN '< 1.0'
+		WHEN Engine_size BETWEEN 1000 AND 2000 THEN '1.0 - 2.0'
+		WHEN Engine_size BETWEEN 2000 AND 3000 THEN '2.0 - 3.0'
+	ELSE '> 3.0'
+	END)
+ORDER BY [Quantity] DESC;
+
+--Advertisement table (2012-2021):
+--Most popular brand and model on used cars advertisement
+SELECT
+	Maker,
+	COUNT(Maker) AS [Quantity]
+FROM Ad_tbl
+GROUP BY Maker
+ORDER BY [Quantity] DESC;
+
+WITH Brand_cte AS (
+SELECT
+	Maker,
+	Genmodel,
+	RANK() OVER (PARTITION BY Maker ORDER BY COUNT(Genmodel) DESC) AS rk,
+	COUNT(Genmodel) AS [Quantity]
+FROM Ad_tbl
+GROUP BY
+	Maker,
+	Genmodel
+)
+SELECT
+	Maker,
+	Genmodel,
+	[Quantity]
+FROM Brand_cte
+WHERE rk = 1
+ORDER BY Maker;
+
+--Colour
+SELECT
+	Color,
+	COUNT(Color) AS [Quantity]
+FROM Ad_tbl
+GROUP BY Color
+ORDER BY [Quantity] DESC;
+
+--Body type
+SELECT
+	Bodytype,
+	COUNT(Bodytype) AS [Quantity]
+FROM Ad_tbl
+GROUP BY Bodytype
+ORDER BY [Quantity] DESC;
+
+--Average Runned Miles
+SELECT AVG(CAST(Runned_Miles AS BIGINT)) AS [Average_runned_miles]
+FROM Ad_tbl
+WHERE Runned_Miles IS NOT NULL;
+
+--Gear box
+SELECT
+	Gearbox,
+	COUNT(Gearbox) AS [Quantity]
+FROM Ad_tbl
+GROUP BY Gearbox
+ORDER BY Quantity DESC;
+
+--Fuel type
+SELECT
+	Fuel_type,
+	COUNT(Fuel_type) AS [Quantity]
+FROM Ad_tbl
+GROUP BY Fuel_type
+ORDER BY Quantity DESC;
+
+--Average age by brand
+SELECT TOP 10
+	Maker,
+	AVG((Adv_year - Reg_year)) AS [Average_age_of_vehicle],
+	COUNT(Genmodel) AS [Quantity_of_vehicles]
+FROM Ad_tbl
+GROUP BY Maker
+ORDER BY [Quantity_of_vehicles] DESC;
+
+--Most popular register and selling year
+SELECT TOP 1 Reg_year
+FROM Ad_tbl
+GROUP BY Reg_year
+ORDER BY COUNT(Reg_year) DESC;
+
+SELECT TOP 1 Adv_year
+FROM Ad_tbl
+GROUP BY Adv_year
+ORDER BY COUNT(Adv_year) DESC;
