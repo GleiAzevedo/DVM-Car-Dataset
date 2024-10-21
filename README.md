@@ -1,6 +1,6 @@
 # DVM-Car-Dataset
 
-The car market in the UK is the objective of analysis of this project, focusing on the most popular car brands, models and units sold between 2001 and 2020.
+The car market in the UK is the target of analysis for this project, focusing on the most popular car brands, models and units sold between 2001 and 2020.
 
 # Dataset description
 
@@ -14,7 +14,7 @@ The car market in the UK is the objective of analysis of this project, focusing 
 
 # Tools
 
-+ Microsoft SQL Server Management Studios for data analysis - View [SQL Scripts]()
++ Microsoft SQL Server Management Studios for data analysis - View [SQL Scripts](https://github.com/GleiAzevedo/DVM-Car-Dataset/blob/main/DVM%20Car%20Dataset%20queries%20sql)
 + Power BI for data visualization.
 
 # Key Questions Explored
@@ -36,7 +36,8 @@ FROM Basic_tbl
 GROUP BY Automaker
 ORDER BY Number_of_models DESC;
 ```
-PICTURE 1
+![1-1 DVM CAR](https://github.com/user-attachments/assets/88ef2a82-e9e5-439c-befc-404adf3c64da)  ![1-2 DVM CAR](https://github.com/user-attachments/assets/b7aacf86-5832-4cfa-965a-5164a5e3608d)
+![1-3 DVM CAR](https://github.com/user-attachments/assets/26c8ff2e-d036-4094-b674-05918c407e42)
 
 2 -  Average car price, most expensive and cheapest car per brand and year:
 
@@ -54,8 +55,6 @@ GROUP BY
 ORDER BY Maker;
 ```
 
-PICTURE 2
-
 3 - Average car price per year:
 
 ```
@@ -66,7 +65,7 @@ FROM Price_tbl
 GROUP BY [Year]
 ORDER BY [Year];
 ```
-PICTURE 3
+![3-1 DVM CAR](https://github.com/user-attachments/assets/b03b755b-f8c1-44b7-9a40-e410d6de3a9b)
 
 4 - Automakers from the most sold to the least sold brand (Sales table, new units) (2001 - 2020):
 
@@ -94,7 +93,8 @@ GROUP BY Maker
 ORDER BY Units_sold DESC;
 ```
 
-PICTURE 4
+![4-1 DVM CAR](https://github.com/user-attachments/assets/beb91630-87b8-4239-b32c-dddfc20834f4)  ![4-2 DVM CAR](https://github.com/user-attachments/assets/3cb2766e-0cfb-4699-83c6-3a1abc251208)
+ ![4-3 DVM CAR](https://github.com/user-attachments/assets/f91368ab-adc6-4289-9bf2-50ae076ca45d)
 
 5 - 3 most sold brands per year:
 
@@ -118,8 +118,7 @@ FROM (
 WHERE rn IN (1,2,3)
 ORDER BY [Year];
 ```
-
-PICTURE 5
+![5-1 DVM CAR](https://github.com/user-attachments/assets/533db024-d85a-4b14-a4a6-7d0538201a31)  ![5-2 DVM CAR](https://github.com/user-attachments/assets/87a7b2a6-53de-468d-8a69-af527c2834bc)
 
 6 -  Top 10 sold models in general (2001 - 2020):
 
@@ -135,7 +134,7 @@ GROUP BY
 ORDER BY [Units_sold] DESC;
 ```
 
-PICTURE 6
+![6-1 DVM CAR](https://github.com/user-attachments/assets/4f5e7dce-1ca7-49a7-8287-a72c6df9a328)
 
 7 - Most sold model per brand (2001 - 2020):
 
@@ -159,7 +158,8 @@ FROM Maxsold_cte
 WHERE rk = 1;
 ```
 
-PICTURE 7
+![7-1 DVM CAR](https://github.com/user-attachments/assets/7113f64f-5b3f-495e-aec6-a157781204f4) ![7-3 DVM CAR](https://github.com/user-attachments/assets/54b50d4f-3081-4414-bf61-7f047c5113e0)
+![7-2 DVM CAR](https://github.com/user-attachments/assets/c5c262de-c70a-4bec-8a93-9b72ec0c4240)
 
 8 - Fuel type (1998 - 2021):
 
@@ -180,6 +180,8 @@ GROUP BY
 	Quantity;
 ```
 
+![8-1 DVM CAR](https://github.com/user-attachments/assets/3bc51b94-a2ab-4864-864e-d09ca80c911b)
+
 Electric cars on the 'Other' category, based on 0 gas emission. How many are they, cheapest and most expensive?
 
 ```
@@ -193,6 +195,7 @@ WHERE Gas_emission = 0
 	AND Fuel_type = 'Other'
 GROUP BY Fuel_type;
 ```
+![8-2 DVM CAR](https://github.com/user-attachments/assets/8568d892-61f6-413d-8630-3234b0eb8149)
 
 The hybrid cars number below is only the minimum number as they may have different trim details, abbreviations, gas emission etc., not included on the parameters searched.
 
@@ -232,7 +235,7 @@ SELECT
 FROM Hybrid_cte;
 ```
 
-PICTURE 8
+![8-3 DVM CAR](https://github.com/user-attachments/assets/864038ad-e9fa-4b0f-a9c8-544911c88ec1)
 
 9 - Most popular brand and model on used cars advertisement (2012-2021):
 
@@ -264,7 +267,11 @@ WHERE rk = 1
 ORDER BY Maker;
 ```
 
-PICTURE 9
+![9-1 DVM CAR](https://github.com/user-attachments/assets/4470ee4f-5af9-4305-8a41-748fc5fc61ae) ![9-2 DVM CAR](https://github.com/user-attachments/assets/17093900-3071-4824-a6ce-32979754a61b)
+![9-3 DVM CAR](https://github.com/user-attachments/assets/790372c5-654a-43dd-9e90-c30471afd6b0)
+
+![9-4 DVM CAR](https://github.com/user-attachments/assets/29c6ba82-c663-4db6-ba29-02e719042148) ![9-5 DVM CAR](https://github.com/user-attachments/assets/0c9efa05-47d2-41ea-8ab1-07d2329220cc)
+![9-6 DVM CAR](https://github.com/user-attachments/assets/de628039-34d1-4a11-a61c-68b9fc7ef9ad)
 
 Most popular colour:
 
@@ -277,7 +284,7 @@ GROUP BY Color
 ORDER BY [Quantity] DESC;
 ```
 
-PICTURE 10
+![10 DVM CAR](https://github.com/user-attachments/assets/ff34623c-e86b-4e05-9ea1-42812b188c54)
 
 Most popular body type:
 
@@ -290,7 +297,7 @@ GROUP BY Bodytype
 ORDER BY [Quantity] DESC;
 ```
 
-PICTURE 11
+![11 DVM CAR](https://github.com/user-attachments/assets/d5e65500-a910-4af4-8dd8-b775aae56f20)
 
 Average Runned Miles:
 
@@ -300,7 +307,7 @@ FROM Ad_tbl
 WHERE Runned_Miles IS NOT NULL;
 ```
 
-PICTURE 12
+![12 DVM CAR](https://github.com/user-attachments/assets/bd95b772-eab9-4d2d-91f4-c0ae236b89df)
 
 Average age by brand:
 
@@ -314,7 +321,7 @@ GROUP BY Maker
 ORDER BY [Quantity_of_vehicles] DESC;
 ```
 
-PICTURE 13
+![13 DVM CAR](https://github.com/user-attachments/assets/9c8ee803-1324-4f24-8f69-a5dd688cd0e3)
 
 Most popular register and selling year:
 
@@ -329,5 +336,8 @@ FROM Ad_tbl
 GROUP BY Adv_year
 ORDER BY COUNT(Adv_year) DESC;
 ```
+
+![14 DVM CAR](https://github.com/user-attachments/assets/26b3a0b9-083b-4c66-8962-63a5b19059b3)
+
 
 PICTURE 14
