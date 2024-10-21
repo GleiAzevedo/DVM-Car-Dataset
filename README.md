@@ -21,7 +21,7 @@ Although the dataset also offers a wide range of cars images, for the purposes o
 
 # Key Questions Explored
 
-1 - Quantity of brands and how many models per brand:
+1 - Number of brands and how many models per brand:
 
 ```
 SELECT COUNT(DISTINCT Automaker_ID) AS [Brands]
