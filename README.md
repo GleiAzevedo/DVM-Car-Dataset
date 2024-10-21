@@ -338,6 +338,3 @@ ORDER BY COUNT(Adv_year) DESC;
 ```
 
 ![14 DVM CAR](https://github.com/user-attachments/assets/26b3a0b9-083b-4c66-8962-63a5b19059b3)
-
-
-PICTURE 14
