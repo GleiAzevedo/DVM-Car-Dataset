@@ -21,7 +21,7 @@ The car market in the UK is the objective of analysis of this project, focusing 
 
 1 - Quantity of brands and how many models per brand:
 
-'''
+```
 SELECT COUNT(DISTINCT Automaker_ID) AS [Brands]
 FROM Basic_tbl;
 SELECT
@@ -35,12 +35,12 @@ SELECT
 FROM Basic_tbl
 GROUP BY Automaker
 ORDER BY Number_of_models DESC;
-'''
+```
 PICTURE 1
 
 2 -  Average car price, most expensive and cheapest car per brand and year:
 
-'''
+```
 SELECT
 	Maker,
 	AVG(Entry_price) AS [Avg_Price],
@@ -52,25 +52,25 @@ GROUP BY
 	Maker,
 	[Year]
 ORDER BY Maker;
-'''
+```
 
 PICTURE 2
 
 3 - Average car price per year:
 
-'''
+```
 SELECT
 	[Year],
 	AVG(Entry_Price) AS [Average_car_price]
 FROM Price_tbl
 GROUP BY [Year]
 ORDER BY [Year];
-'''
+```
 PICTURE 3
 
 4 - Automakers from the most sold to the least sold brand (Sales table, new units) (2001 - 2020):
 
-'''
+```
 CREATE VIEW UnpivotedSales AS
 SELECT Maker, Genmodel, Genmodel_ID, [Year], Units
 FROM 
@@ -92,13 +92,13 @@ SELECT
 FROM UnpivotedSales
 GROUP BY Maker
 ORDER BY Units_sold DESC;
-'''
+```
 
 PICTURE 4
 
 5 - 3 most sold brands per year:
 
-'''
+```
 SELECT
 	Maker,
 	Units_sold,
@@ -117,13 +117,13 @@ FROM (
 ) AS RankedBrands
 WHERE rn IN (1,2,3)
 ORDER BY [Year];
-'''
+```
 
 PICTURE 5
 
 6 -  Top 10 sold models in general (2001 - 2020):
 
-'''
+```
 SELECT TOP 10
 	Maker,
 	Genmodel,
@@ -133,13 +133,13 @@ GROUP BY
 	Maker,
 	Genmodel
 ORDER BY [Units_sold] DESC;
-'''
+```
 
 PICTURE 6
 
 7 - Most sold model per brand (2001 - 2020):
 
-'''
+```
 WITH Maxsold_cte AS (
 	SELECT
 		Maker,
@@ -157,13 +157,13 @@ SELECT
 	[Units_sold]
 FROM Maxsold_cte
 WHERE rk = 1;
-'''
+```
 
 PICTURE 7
 
 8 - Fuel type (1998 - 2021):
 
-'''
+```
 WITH Fuel_cte  AS (
 	SELECT
 		Fuel_Type,
@@ -178,11 +178,11 @@ FROM Fuel_cte
 GROUP BY
 	Fuel_type,
 	Quantity;
-'''
+```
 
 Electric cars on the 'Other' category, based on 0 gas emission. How many are they, cheapest and most expensive?
 
-'''
+```
 SELECT
 	Fuel_Type,
 	COUNT(Fuel_type) AS [Quantity],
@@ -192,11 +192,11 @@ FROM Trim_tbl
 WHERE Gas_emission = 0
 	AND Fuel_type = 'Other'
 GROUP BY Fuel_type;
-'''
+```
 
 The hybrid cars number below is only the minimum number as they may have different trim details, abbreviations, gas emission etc., not included on the parameters searched.
 
-'''
+```
 WITH Hybrid_cte AS (
 	SELECT
 		'Hybrid' AS [Fuel_type],
@@ -230,13 +230,13 @@ SELECT
 	'Total' AS [Total],
 	SUM([Quantity]) AS [Quantity]
 FROM Hybrid_cte;
-'''
+```
 
 PICTURE 8
 
 9 - Most popular brand and model on used cars advertisement (2012-2021):
 
-'''
+```
 SELECT
 	Maker,
 	COUNT(Maker) AS [Quantity]
@@ -262,49 +262,49 @@ SELECT
 FROM Brand_cte
 WHERE rk = 1
 ORDER BY Maker;
-'''
+```
 
 PICTURE 9
 
 Most popular colour:
 
-'''
+```
 SELECT
 	Color,
 	COUNT(Color) AS [Quantity]
 FROM Ad_tbl
 GROUP BY Color
 ORDER BY [Quantity] DESC;
-'''
+```
 
 PICTURE 10
 
 Most popular body type:
 
-'''
+```
 SELECT
 	Bodytype,
 	COUNT(Bodytype) AS [Quantity]
 FROM Ad_tbl
 GROUP BY Bodytype
 ORDER BY [Quantity] DESC;
-'''
+```
 
 PICTURE 11
 
 Average Runned Miles:
 
-'''
+```
 SELECT AVG(CAST(Runned_Miles AS BIGINT)) AS [Average_runned_miles]
 FROM Ad_tbl
 WHERE Runned_Miles IS NOT NULL;
-'''
+```
 
 PICTURE 12
 
 Average age by brand:
 
-'''
+```
 SELECT TOP 10
 	Maker,
 	AVG((Adv_year - Reg_year)) AS [Average_age_of_vehicle],
@@ -312,13 +312,13 @@ SELECT TOP 10
 FROM Ad_tbl
 GROUP BY Maker
 ORDER BY [Quantity_of_vehicles] DESC;
-'''
+```
 
 PICTURE 13
 
 Most popular register and selling year:
 
-'''
+```
 SELECT TOP 1 Reg_year
 FROM Ad_tbl
 GROUP BY Reg_year
@@ -328,6 +328,6 @@ SELECT TOP 1 Adv_year
 FROM Ad_tbl
 GROUP BY Adv_year
 ORDER BY COUNT(Adv_year) DESC;
-'''
+```
 
 PICTURE 14
